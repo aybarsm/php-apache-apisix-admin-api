@@ -8,6 +8,7 @@ use Aybarsm\Apache\Apisix\AdminApi\Dto\Contracts\Dto;
 use Aybarsm\Apache\Apisix\AdminApi\Enums\HttpMethod;
 use Aybarsm\Apache\Apisix\AdminApi\Exceptions\InvalidArgumentException;
 use Aybarsm\Apache\Apisix\AdminApi\Internal\JsonBody;
+use Aybarsm\Apache\Apisix\AdminApi\Internal\Pagination;
 use Aybarsm\Apache\Apisix\AdminApi\Internal\Response;
 use Aybarsm\Apache\Apisix\AdminApi\Support\DeleteResult;
 use Aybarsm\Apache\Apisix\AdminApi\Support\Envelope;
@@ -64,22 +65,7 @@ abstract readonly class AbstractResource extends Endpoint
      */
     protected function doLazy(?ListQuery $query, array $supported): Generator
     {
-        $query ??= new ListQuery();
-        $pageSize = $query->pageSize ?? static::DEFAULT_PAGE_SIZE;
-        $page = $query->page ?? 1;
-
-        while (true) {
-            $result = $this->doList($query->withPage($page, $pageSize), $supported);
-            foreach ($result->items as $item) {
-                yield $item;
-            }
-
-            $count = count($result->items);
-            if ($count === 0 || $count < $pageSize || $page * $pageSize >= $result->total) {
-                return;
-            }
-            $page++;
-        }
+        return Pagination::lazy(fn (ListQuery $q): Page => $this->doList($q, $supported), $query, $supported, static::DEFAULT_PAGE_SIZE);
     }
 
     /**

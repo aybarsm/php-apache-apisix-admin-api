@@ -17,6 +17,7 @@ const UNEDITED_DTOS = [
     'HealthCheckPassive', 'HealthCheckPassiveHealthy', 'HealthCheckPassiveUnhealthy',
     'Route', 'Service', 'StreamRoute', 'Proto',
     'Consumer', 'Credential', 'ConsumerGroup', 'PluginConfig', 'GlobalRule',
+    'SSL', 'VaultSecret', 'AwsSecret', 'GcpSecret',
 ];
 
 function dtoGenerator(): DtoGenerator
@@ -33,6 +34,7 @@ const UNEDITED_RESOURCES = [
     'Consumer Groups' => 'ConsumerGroups',
     'Plugin Configs' => 'PluginConfigs',
     'Global Rules' => 'GlobalRules',
+    'SSL Certificates' => 'Ssls',
 ];
 
 it('names things consistently', function (): void {

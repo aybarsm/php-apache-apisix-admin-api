@@ -23,6 +23,7 @@ dataset('crud resources', [
     'protos' => [fn (ApiClient $c) => $c->protos(), 'protos', ['content' => 'syntax = "proto3";'], Aybarsm\Apache\Apisix\AdminApi\Dto\Proto::class],
     'consumer groups' => [fn (ApiClient $c) => $c->consumerGroups(), 'consumer_groups', ['plugins' => ['limit-count' => ['count' => 1]]], Aybarsm\Apache\Apisix\AdminApi\Dto\ConsumerGroup::class],
     'plugin configs' => [fn (ApiClient $c) => $c->pluginConfigs(), 'plugin_configs', ['plugins' => ['cors' => ['allow_origins' => '*']]], Aybarsm\Apache\Apisix\AdminApi\Dto\PluginConfig::class],
+    'ssls' => [fn (ApiClient $c) => $c->ssls(), 'ssls', ['sni' => 'a.test', 'cert' => 'C', 'key' => 'K'], Aybarsm\Apache\Apisix\AdminApi\Dto\Ssl::class],
     'global rules' => [fn (ApiClient $c) => $c->globalRules(), 'global_rules', ['plugins' => ['prometheus' => ['prefer_name' => true]]], Aybarsm\Apache\Apisix\AdminApi\Dto\GlobalRule::class],
 ]);
 

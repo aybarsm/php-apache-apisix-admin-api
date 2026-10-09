@@ -64,7 +64,10 @@ final readonly class SpecLoader
         return sprintf('%s/v%s.overrides.json', $this->directory, ltrim($version, 'v'));
     }
 
-    public function load(?string $version = null): Spec
+    /**
+     * @param bool $applyOverrides false yields the pristine spec (used by `diff`)
+     */
+    public function load(?string $version = null, bool $applyOverrides = true): Spec
     {
         $version = ltrim($version ?? $this->latest(), 'v');
         $document = Json::decodeFile($this->specPath($version));
@@ -76,6 +79,11 @@ final readonly class SpecLoader
         if ($overrides->spec !== sprintf('v%s.json', $version)) {
             throw new SpecException(sprintf('%s targets "%s", expected "v%s.json"', basename($overridesPath), $overrides->spec, $version));
         }
+
+        if (! $applyOverrides) {
+            $overrides = new Overrides($overrides->spec);
+        }
+        $document = $this->patchSchemas($document, $overrides);
 
         $refs = new RefResolver($document);
 
@@ -151,6 +159,35 @@ final readonly class SpecLoader
         ksort($operations);
 
         return $operations;
+    }
+
+    /**
+     * Merges `schemas` overrides into `components.schemas.<name>.properties`.
+     *
+     * @param array<string, mixed> $document
+     *
+     * @return array<string, mixed>
+     */
+    private function patchSchemas(array $document, Overrides $overrides): array
+    {
+        if ($overrides->schemas === []) {
+            return $document;
+        }
+
+        $components = Json::map($document['components'] ?? null, 'components');
+        $schemas = Json::map($components['schemas'] ?? null, 'components.schemas');
+        foreach ($overrides->schemas as $name => $patch) {
+            if (! isset($schemas[$name])) {
+                throw new SpecException(sprintf('Overrides reference unknown schema "%s"', $name));
+            }
+            $schema = Json::map($schemas[$name], 'components.schemas.'.$name);
+            $schema['properties'] = [...Json::optionalMap($schema['properties'] ?? null, $name.'.properties'), ...$patch->properties];
+            $schemas[$name] = $schema;
+        }
+        $components['schemas'] = $schemas;
+        $document['components'] = $components;
+
+        return $document;
     }
 
     /**

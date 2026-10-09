@@ -144,3 +144,19 @@ function runSpec(string ...$argv): array
 
     return [$code, $output->contents()];
 }
+
+/**
+ * Self-signed certificate + key for SNI `$cn` (PEM strings).
+ *
+ * @return array{cert: string, key: string}
+ */
+function selfSignedCertificate(string $cn): array
+{
+    $key = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA]);
+    $csr = openssl_csr_new(['commonName' => $cn], $key, ['digest_alg' => 'sha256']);
+    $x509 = openssl_csr_sign($csr, null, $key, 1, ['digest_alg' => 'sha256']);
+    openssl_x509_export($x509, $cert);
+    openssl_pkey_export($key, $pem);
+
+    return ['cert' => $cert, 'key' => $pem];
+}

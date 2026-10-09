@@ -10,7 +10,7 @@ use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\RefResolver;
 final readonly class Spec
 {
     /**
-     * @param array<string, mixed>     $document   pristine OpenAPI document
+     * @param array<string, mixed>     $document   OpenAPI document with `schemas` overrides applied
      * @param array<string, Operation> $operations keyed by canonical operationId
      */
     public function __construct(

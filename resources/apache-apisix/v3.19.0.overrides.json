@@ -117,6 +117,84 @@
       "issue": "201 response declares an untyped object.",
       "actual": "Returns the stored consumer in the etcd envelope (key /apisix/consumers/{username}).",
       "evidence": "Verified against the APISIX 3.19.0 source shipped in the apache/apisix image (apisix/admin/resource.lua): _M:put returns `res.status, res.body` from core.etcd.set; consumers.lua uses the generic resource with unsupported_methods {post, patch}."
+    },
+    "patchSecretSubPath": {
+      "responses": {
+        "200": {
+          "$ref": "#/paths/~1apisix~1admin~1secrets~1{secret_type}~1{id}/get/responses/200/content/application~1json/schema"
+        }
+      },
+      "issue": "200 response declares no body.",
+      "actual": "Returns the updated secret in the etcd envelope, same shape as getSecret.",
+      "evidence": "Verified against the APISIX 3.19.0 source shipped in the apache/apisix image (apisix/admin/resource.lua): _M:patch has a secrets branch and returns `res.status, res.body` from core.etcd.atomic_set."
+    }
+  },
+  "schemas": {
+    "VaultSecret": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true,
+          "description": "`{secret_type}/{id}` as stored by APISIX."
+        },
+        "create_time": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Epoch timestamp (in seconds) of the creation time."
+        },
+        "update_time": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Epoch timestamp (in seconds) of the last update time."
+        }
+      },
+      "issue": "Component schema omits the server-managed id, create_time and update_time that every secret response carries.",
+      "actual": "Stored secrets include id (\"{type}/{id}\"), create_time and update_time; they are read-only.",
+      "evidence": "Spec v3.19.0 itself: the inline 200 schemas and examples of getSecret/listSecrets/createSecretById list id, create_time and update_time in `value`; APISIX resource.lua _M:put calls utils.inject_conf_with_prev_conf (timestamps)."
+    },
+    "AwsSecret": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true,
+          "description": "`{secret_type}/{id}` as stored by APISIX."
+        },
+        "create_time": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Epoch timestamp (in seconds) of the creation time."
+        },
+        "update_time": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Epoch timestamp (in seconds) of the last update time."
+        }
+      },
+      "issue": "Component schema omits the server-managed id, create_time and update_time that every secret response carries.",
+      "actual": "Stored secrets include id (\"{type}/{id}\"), create_time and update_time; they are read-only.",
+      "evidence": "Spec v3.19.0 itself: the inline 200 schemas and examples of getSecret/listSecrets/createSecretById list id, create_time and update_time in `value`; APISIX resource.lua _M:put calls utils.inject_conf_with_prev_conf (timestamps)."
+    },
+    "GcpSecret": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true,
+          "description": "`{secret_type}/{id}` as stored by APISIX."
+        },
+        "create_time": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Epoch timestamp (in seconds) of the creation time."
+        },
+        "update_time": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Epoch timestamp (in seconds) of the last update time."
+        }
+      },
+      "issue": "Component schema omits the server-managed id, create_time and update_time that every secret response carries.",
+      "actual": "Stored secrets include id (\"{type}/{id}\"), create_time and update_time; they are read-only.",
+      "evidence": "Spec v3.19.0 itself: the inline 200 schemas and examples of getSecret/listSecrets/createSecretById list id, create_time and update_time in `value`; APISIX resource.lua _M:put calls utils.inject_conf_with_prev_conf (timestamps)."
     }
   },
   "exclude": {
@@ -147,6 +225,10 @@
     {
       "topic": "Health tag",
       "detail": "HEAD /apisix/admin (operationId ping) is unauthenticated and returns 200 with no body."
+    },
+    {
+      "topic": "SSL vs SSLRead",
+      "detail": "SSLRead (responses) declares exactly the properties of SSL (requests) without write constraints, and APISIX strips key/keys on reads; a single Ssl DTO mirroring SSL serves both directions."
     }
   ]
 }

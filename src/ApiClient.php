@@ -12,9 +12,13 @@ use Aybarsm\Apache\Apisix\AdminApi\Resources\ConsumerGroups;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Consumers;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\GlobalRules;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\PluginConfigs;
+use Aybarsm\Apache\Apisix\AdminApi\Resources\PluginMetadata;
+use Aybarsm\Apache\Apisix\AdminApi\Resources\Plugins;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Protos;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Routes;
+use Aybarsm\Apache\Apisix\AdminApi\Resources\Secrets;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Services;
+use Aybarsm\Apache\Apisix\AdminApi\Resources\Ssls;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\StreamRoutes;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Upstreams;
 use GuzzleHttp\Client as GuzzleClient;
@@ -106,6 +110,26 @@ final readonly class ApiClient
     public function globalRules(): GlobalRules
     {
         return new GlobalRules($this->transport);
+    }
+
+    public function ssls(): Ssls
+    {
+        return new Ssls($this->transport);
+    }
+
+    public function secrets(): Secrets
+    {
+        return new Secrets($this->transport);
+    }
+
+    public function pluginMetadata(): PluginMetadata
+    {
+        return new PluginMetadata($this->transport);
+    }
+
+    public function plugins(): Plugins
+    {
+        return new Plugins($this->transport);
     }
 
     /**

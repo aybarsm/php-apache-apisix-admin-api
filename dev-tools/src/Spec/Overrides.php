@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aybarsm\Apache\Apisix\AdminApi\Dev\Spec;
 
 use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Model\OperationOverride;
+use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Model\SchemaOverride;
 
 /**
  * Versioned corrections layered over a pristine spec (`v{version}.overrides.json`).
@@ -14,7 +15,9 @@ use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Model\OperationOverride;
  */
 final readonly class Overrides
 {
-    private const array TOP_LEVEL_KEYS = ['$schema', 'spec', 'operations', 'exclude', 'notes'];
+    private const array TOP_LEVEL_KEYS = ['$schema', 'spec', 'operations', 'schemas', 'exclude', 'notes'];
+
+    private const array SCHEMA_KEYS = ['properties', 'issue', 'actual', 'evidence'];
 
     private const array OPERATION_KEYS = ['rename', 'responses', 'issue', 'actual', 'evidence'];
 
@@ -22,12 +25,14 @@ final readonly class Overrides
      * @param array<string, OperationOverride>             $operations keyed by original operationId
      * @param array<string, string>                        $exclude    original operationId => reason
      * @param list<array{topic: string, detail: string}>   $notes
+     * @param array<string, SchemaOverride>                $schemas    component schema name => patch
      */
     public function __construct(
         public string $spec,
         public array $operations = [],
         public array $exclude = [],
         public array $notes = [],
+        public array $schemas = [],
     ) {}
 
     public static function fromFile(string $path): self
@@ -62,6 +67,11 @@ final readonly class Overrides
             $operations[$id] = self::operation($id, Json::map($entry, sprintf('%s.operations.%s', $context, $id)), $context);
         }
 
+        $schemas = [];
+        foreach (Json::optionalMap($data['schemas'] ?? null, $context.'.schemas') as $name => $entry) {
+            $schemas[$name] = self::schema($name, Json::map($entry, sprintf('%s.schemas.%s', $context, $name)), $context);
+        }
+
         $exclude = [];
         foreach (Json::map($data['exclude'], $context.'.exclude') as $id => $reason) {
             $exclude[$id] = Json::nonEmptyString($reason, sprintf('%s.exclude.%s', $context, $id));
@@ -86,7 +96,35 @@ final readonly class Overrides
             }
         }
 
-        return new self($spec, $operations, $exclude, $notes);
+        return new self($spec, $operations, $exclude, $notes, $schemas);
+    }
+
+    /**
+     * @param array<string, mixed> $entry
+     */
+    private static function schema(string $name, array $entry, string $context): SchemaOverride
+    {
+        $ctx = sprintf('%s.schemas.%s', $context, $name);
+        foreach (array_keys($entry) as $key) {
+            if (! in_array($key, self::SCHEMA_KEYS, true)) {
+                throw new SpecException(sprintf('%s: unknown key "%s"', $ctx, $key));
+            }
+        }
+
+        $properties = [];
+        foreach (Json::map($entry['properties'] ?? null, $ctx.'.properties') as $property => $schema) {
+            $properties[$property] = Json::map($schema, sprintf('%s.properties.%s', $ctx, $property));
+        }
+        if ($properties === []) {
+            throw new SpecException(sprintf('%s.properties: must not be empty', $ctx));
+        }
+
+        return new SchemaOverride(
+            properties: $properties,
+            issue: Json::nonEmptyString($entry['issue'] ?? null, $ctx.'.issue'),
+            actual: Json::nonEmptyString($entry['actual'] ?? null, $ctx.'.actual'),
+            evidence: Json::nonEmptyString($entry['evidence'] ?? null, $ctx.'.evidence'),
+        );
     }
 
     /**
