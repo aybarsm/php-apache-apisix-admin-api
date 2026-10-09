@@ -136,12 +136,8 @@ final readonly class Transport
             try {
                 $body = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
             } catch (JsonException $e) {
-                $response = new Response($method->value, $target, $psr->getStatusCode(), $headers, $raw, $raw);
-                if ($response->status < 400 && str_contains($contentType, 'json')) {
-                    throw $response->unexpected('invalid JSON body: '.$e->getMessage());
-                }
-
-                return $response;
+                // e.g. plugins/reload answers `done` as application/json; callers needing an object still fail
+                return new Response($method->value, $target, $psr->getStatusCode(), $headers, $raw, $raw, $e->getMessage());
             }
         }
 

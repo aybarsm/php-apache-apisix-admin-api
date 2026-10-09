@@ -127,6 +127,11 @@
       "issue": "200 response declares no body.",
       "actual": "Returns the updated secret in the etcd envelope, same shape as getSecret.",
       "evidence": "Verified against the APISIX 3.19.0 source shipped in the apache/apisix image (apisix/admin/resource.lua): _M:patch has a secrets branch and returns `res.status, res.body` from core.etcd.atomic_set."
+    },
+    "getResourceSchema": {
+      "issue": "The {resource} path parameter reuses ResourceKindInPath, whose values are plural (routes, ssls, ...).",
+      "actual": "GET /schema/{resource} expects the singular core.schema key (route, ssl, plugin_config, ...); plural names return 400 \"not found schema\". The validate endpoint does accept the plural names.",
+      "evidence": "apisix/admin/schema.lua _M.get looks up core.schema[name]; live APISIX 3.19.0: GET /schema/routes -> 400 {\"error_msg\":\"not found schema: routes\"}, GET /schema/route -> 200 (2026-10-09)."
     }
   },
   "schemas": {
@@ -216,7 +221,7 @@
     },
     {
       "topic": "PUT /apisix/admin/plugins/reload",
-      "detail": "Responds with a plain string body rather than a JSON object."
+      "detail": "Responds with the plain-text body `done` while declaring Content-Type: application/json (live APISIX 3.19.0); the client returns the raw string."
     },
     {
       "topic": "Untyped responses",
@@ -229,6 +234,10 @@
     {
       "topic": "SSL vs SSLRead",
       "detail": "SSLRead (responses) declares exactly the properties of SSL (requests) without write constraints, and APISIX strips key/keys on reads; a single Ssl DTO mirroring SSL serves both directions."
+    },
+    {
+      "topic": "label query parameter",
+      "detail": "`label` matches resources that have the given label key (apisix/admin/v3_adapter.lua compares keys only); `key:value` never matches."
     }
   ]
 }

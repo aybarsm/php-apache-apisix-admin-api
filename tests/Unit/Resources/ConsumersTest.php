@@ -35,8 +35,8 @@ it('gets, lists and deletes consumers by username', function (): void {
     expect($consumers->get('jack')->value)->toBeInstanceOf(Consumer::class)
         ->and($http->lastTarget())->toBe('/apisix/admin/consumers/jack');
 
-    $consumers->list(new ListQuery(label: 'team:a', page: 1, pageSize: 10));
-    expect($http->lastTarget())->toBe('/apisix/admin/consumers?page=1&page_size=10&label=team%3Aa');
+    $consumers->list(new ListQuery(label: 'team', page: 1, pageSize: 10));
+    expect($http->lastTarget())->toBe('/apisix/admin/consumers?page=1&page_size=10&label=team');
 
     $consumers->delete('jack', force: true);
     expect($http->lastTarget())->toBe('/apisix/admin/consumers/jack?force=true');

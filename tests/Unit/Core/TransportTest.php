@@ -123,11 +123,16 @@ it('decodes JSON bodies even without a JSON content type', function (): void {
     expect(fakeTransport($http)->send(HttpMethod::Get)->body)->toBe(['a' => 1]);
 });
 
-it('throws on invalid JSON in a successful JSON response', function (): void {
-    $http = fakeHttp()->push(new Response(200, ['Content-Type' => 'application/json'], '{oops'));
+it('keeps undecodable JSON bodies raw and fails only when an object is required', function (): void {
+    $http = fakeHttp()
+        ->push(new Response(200, ['Content-Type' => 'application/json'], '{oops'))
+        ->push(new Response(200, ['Content-Type' => 'application/json'], 'done'));
+    $transport = fakeTransport($http);
 
-    expect(fn () => fakeTransport($http)->send(HttpMethod::Get, ['routes']))
-        ->toThrow(UnexpectedResponseException::class, 'GET /apisix/admin/routes: 200 invalid JSON body');
+    $broken = $transport->send(HttpMethod::Get, ['routes']);
+    expect($broken->body)->toBe('{oops')
+        ->and(fn () => $broken->object())->toThrow(UnexpectedResponseException::class, 'GET /apisix/admin/routes: 200 invalid JSON body')
+        ->and($transport->send(HttpMethod::Put, ['plugins', 'reload'])->body)->toBe('done');
 });
 
 it('maps error statuses onto exceptions', function (int $status, string $class): void {

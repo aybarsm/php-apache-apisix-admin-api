@@ -18,7 +18,7 @@ describe('schema', function (): void {
         $schema = fakeClient($http)->schema();
 
         expect($schema->resource(ResourceKind::StreamRoutes))->toBe(['type' => 'object'])
-            ->and($http->lastTarget())->toBe('/apisix/admin/schema/stream_routes')
+            ->and($http->lastTarget())->toBe('/apisix/admin/schema/stream_route')
             ->and($schema->plugin('key-auth'))->toBe(['properties' => []])
             ->and($http->lastTarget())->toBe('/apisix/admin/schema/plugins/key-auth');
     });

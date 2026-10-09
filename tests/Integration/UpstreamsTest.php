@@ -46,14 +46,14 @@ it('runs the full upstream lifecycle', function (): void {
     expect(array_map(fn ($e) => $e->id(), $page->items))->toContain($id);
 
     $lazyIds = [];
-    foreach ($upstreams->lazy(new ListQuery(pageSize: 10, label: 'suite:apisix-php')) as $envelope) {
+    foreach ($upstreams->lazy(new ListQuery(pageSize: 10, label: 'suite')) as $envelope) {
         $lazyIds[] = $envelope->id();
     }
     expect($lazyIds)->toContain($id);
 
     $patched = $upstreams->patch($id, ['desc' => 'patched', 'labels' => ['suite' => 'apisix-php', 'stage' => 'patch']]);
     expect($patched->value->desc)->toBe('patched')
-        ->and($patched->value->labels)->toBe(['suite' => 'apisix-php', 'stage' => 'patch']);
+        ->and(canonical($patched->value->labels))->toBe(canonical(['suite' => 'apisix-php', 'stage' => 'patch']));
 
     $pathed = $upstreams->patchPath($id, 'retries', 2);
     expect($pathed->value->retries)->toBe(2)

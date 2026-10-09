@@ -46,7 +46,7 @@ dataset('live crud resources', [
     ],
     'consumer groups' => [
         fn (ApiClient $c) => $c->consumerGroups(),
-        fn (string $id) => new ConsumerGroup(plugins: ['limit-count' => ['count' => 100, 'time_window' => 60, 'rejected_code' => 503, 'group' => $id]], name: $id, labels: LIVE_LABELS),
+        fn (string $id) => new ConsumerGroup(plugins: ['limit-count' => ['count' => 100, 'time_window' => 60, 'rejected_code' => 503]], name: $id, labels: LIVE_LABELS),
         'plugins/limit-count/count', 50, fn (ConsumerGroup $g) => $g->plugins['limit-count']['count'] ?? null,
     ],
     'plugin configs' => [
@@ -90,7 +90,7 @@ it('runs the full lifecycle against APISIX', function (Closure $resource, Closur
         }
 
         $lazy = [];
-        foreach ($resources->lazy(new ListQuery(pageSize: 10, label: $named ? 'suite:apisix-php' : null)) as $envelope) {
+        foreach ($resources->lazy(new ListQuery(pageSize: 10, label: $named ? 'suite' : null)) as $envelope) {
             $lazy[] = $envelope->id();
         }
         expect($lazy)->toContain($id);

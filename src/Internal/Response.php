@@ -15,7 +15,8 @@ final readonly class Response
 {
     /**
      * @param array<string, list<string>> $headers lower-cased names
-     * @param mixed $body decoded JSON, the raw string for non-JSON bodies, or null when empty
+     * @param mixed       $body        decoded JSON, the raw string for non-JSON bodies, or null when empty
+     * @param string|null $decodeError set when a JSON-looking body failed to decode (body then holds the raw string)
      */
     public function __construct(
         public string $method,
@@ -24,6 +25,7 @@ final readonly class Response
         public array $headers,
         public mixed $body,
         public string $raw,
+        public ?string $decodeError = null,
     ) {}
 
     public function header(string $name): ?string
@@ -40,6 +42,9 @@ final readonly class Response
      */
     public function object(): array
     {
+        if ($this->decodeError !== null) {
+            throw $this->unexpected('invalid JSON body: '.$this->decodeError);
+        }
         if (! is_array($this->body) || ($this->body !== [] && array_is_list($this->body))) {
             throw $this->unexpected('expected a JSON object body');
         }

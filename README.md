@@ -118,7 +118,7 @@ $apisix->upstreams()->delete('httpbin', force: true);
 use Aybarsm\Apache\Apisix\AdminApi\Support\ListQuery;
 
 // One page. Without page or pageSize, APISIX returns everything.
-$page = $apisix->routes()->list(new ListQuery(page: 1, pageSize: 50, label: 'team:payments'));
+$page = $apisix->routes()->list(new ListQuery(page: 1, pageSize: 50, label: 'team'));
 
 // Lazy: one request per page, as you iterate.
 foreach ($apisix->routes()->lazy(new ListQuery(pageSize: 100)) as $envelope) {
@@ -126,7 +126,7 @@ foreach ($apisix->routes()->lazy(new ListQuery(pageSize: 100)) as $envelope) {
 }
 ```
 
-`ListQuery` supports `page`, `pageSize` (10–500), `name`, `label`, `uri` and `filter`. If you set a filter that the endpoint's spec does not declare, an `InvalidArgumentException` is thrown. It is never silently ignored.
+`ListQuery` supports `page`, `pageSize` (10–500), `name` (a regex), `label` (a label key; resources that carry that key match, whatever its value), `uri` (a regex) and `filter`. If you set a filter that the endpoint's spec does not declare, an `InvalidArgumentException` is thrown. It is never silently ignored.
 
 ## Consumers, credentials and secrets
 

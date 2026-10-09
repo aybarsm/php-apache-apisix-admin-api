@@ -18,7 +18,7 @@ it('manages SSL certificates without ever reading the private key back', functio
     $pair = selfSignedCertificate($sni);
 
     try {
-        $created = $ssls->put($id, new Ssl(labels: ['suite' => 'apisix-php'], type: SslType::Server, sni: $sni, cert: $pair['cert'], key: $pair['key']));
+        $created = $ssls->put($id, new Ssl(labels: ['suite' => 'apisix-php'], type: SslType::Server, sni: $sni, cert: $pair['cert'], key: $pair['key'], status: Status::Enabled));
         expect($created->id())->toBe($id);
 
         $fetched = $ssls->get($id);
@@ -26,7 +26,7 @@ it('manages SSL certificates without ever reading the private key back', functio
             ->and($fetched->value->status)->toBe(Status::Enabled)
             ->and($fetched->value->key)->toBeNull(); // APISIX strips keys on read
 
-        expect(array_map(fn ($e) => $e->id(), $ssls->list(new ListQuery(label: 'suite:apisix-php'))->items))->toContain($id)
+        expect(array_map(fn ($e) => $e->id(), $ssls->list(new ListQuery(label: 'suite'))->items))->toContain($id)
             ->and($ssls->patch($id, ['desc' => 'patched'])->value->desc)->toBe('patched')
             ->and($ssls->patchPath($id, 'status', 0)->value->status)->toBe(Status::Disabled)
             ->and($ssls->delete($id)->key)->toEndWith('/ssls/'.$id)

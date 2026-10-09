@@ -53,7 +53,7 @@ describe('plugins', function (): void {
     });
 
     it('reloads plugins and returns the plain-text answer', function (): void {
-        $http = fakeHttp()->push(new Response(200, ['Content-Type' => 'text/plain'], 'done'));
+        $http = fakeHttp()->push(new Response(200, ['Content-Type' => 'application/json'], 'done')); // as APISIX 3.19 answers
 
         expect(fakeClient($http)->plugins()->reload())->toBe('done')
             ->and([$http->last()->getMethod(), $http->lastTarget()])->toBe(['PUT', '/apisix/admin/plugins/reload']);

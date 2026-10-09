@@ -31,7 +31,9 @@ final readonly class ListQuery
     public const string FILTER = 'filter';
 
     /**
-     * @param string|null $label `key` or `key:value`
+     * @param string|null $name   regex matched against `name`
+     * @param string|null $label  label key; matches resources carrying that key (any value)
+     * @param string|null $uri    regex matched against `uri`/`uris` (routes)
      * @param string|null $filter URL-encoded expression, e.g. `service_id=1`
      */
     public function __construct(

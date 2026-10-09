@@ -20,4 +20,24 @@ enum ResourceKind: string
     case Protos = 'protos';
     case ConsumerGroups = 'consumer_groups';
     case Credentials = 'credentials';
+
+    /**
+     * Singular name APISIX uses for `GET /schema/{name}` (its `core.schema` keys).
+     */
+    public function schemaName(): string
+    {
+        return match ($this) {
+            self::Routes => 'route',
+            self::Services => 'service',
+            self::Upstreams => 'upstream',
+            self::Consumers => 'consumer',
+            self::Ssls => 'ssl',
+            self::PluginConfigs => 'plugin_config',
+            self::GlobalRules => 'global_rule',
+            self::StreamRoutes => 'stream_route',
+            self::Protos => 'proto',
+            self::ConsumerGroups => 'consumer_group',
+            self::Credentials => 'credential',
+        };
+    }
 }

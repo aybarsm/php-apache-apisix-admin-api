@@ -15,10 +15,10 @@ it('lists upstreams with filters and pagination', function (): void {
     $example = SpecExamples::response('listUpstreams')['1'];
     $http = fakeHttp()->json(200, $example);
 
-    $page = fakeClient($http)->upstreams()->list(new ListQuery(page: 1, pageSize: 10, name: 'upstream-for-test', label: 'env:dev'));
+    $page = fakeClient($http)->upstreams()->list(new ListQuery(page: 1, pageSize: 10, name: 'upstream-for-test', label: 'env'));
 
     expect($http->last()->getMethod())->toBe('GET')
-        ->and($http->lastTarget())->toBe('/apisix/admin/upstreams?page=1&page_size=10&name=upstream-for-test&label=env%3Adev')
+        ->and($http->lastTarget())->toBe('/apisix/admin/upstreams?page=1&page_size=10&name=upstream-for-test&label=env')
         ->and($page->total)->toBe($example['total'])
         ->and($page->items[0]->value)->toBeInstanceOf(Upstream::class)
         ->and($page->items[0]->value->type)->toBe(UpstreamType::Roundrobin)

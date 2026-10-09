@@ -19,7 +19,7 @@ it('manages consumers and their credentials', function (): void {
         expect($consumers->get($username)->value->desc)->toBe('apisix-php');
 
         $listed = [];
-        foreach ($consumers->lazy(new ListQuery(label: 'suite:apisix-php', pageSize: 10)) as $envelope) {
+        foreach ($consumers->lazy(new ListQuery(label: 'suite', pageSize: 10)) as $envelope) {
             $listed[] = $envelope->id();
         }
         expect($listed)->toContain($username);

@@ -19,12 +19,14 @@ final readonly class Schema extends Endpoint
     /**
      * JSON Schema APISIX uses to validate a resource kind.
      *
+     * APISIX expects the singular kind here (`route`), unlike the validate endpoint; see overrides.
+     *
      * @return array<string, mixed>
      */
     #[SpecOperation('getResourceSchema')]
     public function resource(ResourceKind $kind): array
     {
-        return $this->transport->send(HttpMethod::Get, ['schema', $kind->value])->object();
+        return $this->transport->send(HttpMethod::Get, ['schema', $kind->schemaName()])->object();
     }
 
     /**
