@@ -16,9 +16,11 @@ use Aybarsm\Apache\Apisix\AdminApi\Resources\PluginMetadata;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Plugins;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Protos;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Routes;
+use Aybarsm\Apache\Apisix\AdminApi\Resources\Schema;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Secrets;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Services;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Ssls;
+use Aybarsm\Apache\Apisix\AdminApi\Resources\Standalone;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\StreamRoutes;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Upstreams;
 use GuzzleHttp\Client as GuzzleClient;
@@ -130,6 +132,19 @@ final readonly class ApiClient
     public function plugins(): Plugins
     {
         return new Plugins($this->transport);
+    }
+
+    public function schema(): Schema
+    {
+        return new Schema($this->transport);
+    }
+
+    /**
+     * API-driven standalone mode (`deployment.role_data_plane.config_provider: yaml`).
+     */
+    public function standalone(): Standalone
+    {
+        return new Standalone($this->transport);
     }
 
     /**

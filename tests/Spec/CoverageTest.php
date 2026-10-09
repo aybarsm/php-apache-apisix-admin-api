@@ -16,3 +16,19 @@ it('maps #[SpecOperation] attributes consistently with the latest spec', functio
         ->and($report->duplicates)->toBe([], 'Operations mapped more than once')
         ->and($report->excludedMapped)->toBe([], 'Excluded operations must not be mapped');
 });
+
+it('maps every implementable operation of the latest spec', function (): void {
+    $report = CoverageReport::build(
+        SpecLoader::forProject(projectRoot())->load(),
+        AttributeScanner::forProject(projectRoot())->scan(),
+    );
+
+    expect($report->unmapped)->toBe([], 'Run `bin/spec coverage` for details')
+        ->and($report->isComplete())->toBeTrue();
+});
+
+it('makes bin/spec coverage exit successfully', function (): void {
+    [$code, $out] = runSpec('coverage');
+
+    expect($code)->toBe(0)->and($out)->toContain('Coverage complete.');
+});
