@@ -16,6 +16,7 @@ const UNEDITED_DTOS = [
     'HealthCheckActive', 'HealthCheckActiveHealthy', 'HealthCheckActiveUnhealthy',
     'HealthCheckPassive', 'HealthCheckPassiveHealthy', 'HealthCheckPassiveUnhealthy',
     'Route', 'Service', 'StreamRoute', 'Proto',
+    'Consumer', 'Credential', 'ConsumerGroup', 'PluginConfig', 'GlobalRule',
 ];
 
 function dtoGenerator(): DtoGenerator
@@ -25,6 +26,13 @@ function dtoGenerator(): DtoGenerator
 
 const UNEDITED_RESOURCES = [
     'Upstreams' => 'Upstreams',
+    'Routes' => 'Routes',
+    'Services' => 'Services',
+    'Stream Routes' => 'StreamRoutes',
+    'Protos' => 'Protos',
+    'Consumer Groups' => 'ConsumerGroups',
+    'Plugin Configs' => 'PluginConfigs',
+    'Global Rules' => 'GlobalRules',
 ];
 
 it('names things consistently', function (): void {

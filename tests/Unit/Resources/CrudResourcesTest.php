@@ -21,6 +21,9 @@ dataset('crud resources', [
     'upstreams' => [fn (ApiClient $c) => $c->upstreams(), 'upstreams', ['nodes' => ['127.0.0.1:80' => 1]], Aybarsm\Apache\Apisix\AdminApi\Dto\Upstream::class],
     'stream routes' => [fn (ApiClient $c) => $c->streamRoutes(), 'stream_routes', ['server_port' => 9100], Aybarsm\Apache\Apisix\AdminApi\Dto\StreamRoute::class],
     'protos' => [fn (ApiClient $c) => $c->protos(), 'protos', ['content' => 'syntax = "proto3";'], Aybarsm\Apache\Apisix\AdminApi\Dto\Proto::class],
+    'consumer groups' => [fn (ApiClient $c) => $c->consumerGroups(), 'consumer_groups', ['plugins' => ['limit-count' => ['count' => 1]]], Aybarsm\Apache\Apisix\AdminApi\Dto\ConsumerGroup::class],
+    'plugin configs' => [fn (ApiClient $c) => $c->pluginConfigs(), 'plugin_configs', ['plugins' => ['cors' => ['allow_origins' => '*']]], Aybarsm\Apache\Apisix\AdminApi\Dto\PluginConfig::class],
+    'global rules' => [fn (ApiClient $c) => $c->globalRules(), 'global_rules', ['plugins' => ['prometheus' => ['prefer_name' => true]]], Aybarsm\Apache\Apisix\AdminApi\Dto\GlobalRule::class],
 ]);
 
 function envelopeFor(string $path, array $value): array

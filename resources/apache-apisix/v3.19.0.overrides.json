@@ -107,6 +107,16 @@
       "issue": "200 response declares CredentialListEnvelope for a single-credential lookup.",
       "actual": "Returns a single CredentialEnvelope.",
       "evidence": "Verified against the APISIX 3.19.0 source shipped in the apache/apisix image (apisix/admin/resource.lua): _M:get with an id calls core.etcd.get(key, false) on /consumers/{username}/credentials/{id} (single key, no range)."
+    },
+    "createConsumer": {
+      "responses": {
+        "201": {
+          "$ref": "#/components/schemas/ConsumerEnvelope"
+        }
+      },
+      "issue": "201 response declares an untyped object.",
+      "actual": "Returns the stored consumer in the etcd envelope (key /apisix/consumers/{username}).",
+      "evidence": "Verified against the APISIX 3.19.0 source shipped in the apache/apisix image (apisix/admin/resource.lua): _M:put returns `res.status, res.body` from core.etcd.set; consumers.lua uses the generic resource with unsupported_methods {post, patch}."
     }
   },
   "exclude": {

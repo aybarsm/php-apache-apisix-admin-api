@@ -8,6 +8,10 @@ use Aybarsm\Apache\Apisix\AdminApi\Attributes\SpecOperation;
 use Aybarsm\Apache\Apisix\AdminApi\Enums\HttpMethod;
 use Aybarsm\Apache\Apisix\AdminApi\Exceptions\ApacheApisixApiException;
 use Aybarsm\Apache\Apisix\AdminApi\Internal\Transport;
+use Aybarsm\Apache\Apisix\AdminApi\Resources\ConsumerGroups;
+use Aybarsm\Apache\Apisix\AdminApi\Resources\Consumers;
+use Aybarsm\Apache\Apisix\AdminApi\Resources\GlobalRules;
+use Aybarsm\Apache\Apisix\AdminApi\Resources\PluginConfigs;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Protos;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Routes;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Services;
@@ -82,6 +86,26 @@ final readonly class ApiClient
     public function protos(): Protos
     {
         return new Protos($this->transport);
+    }
+
+    public function consumers(): Consumers
+    {
+        return new Consumers($this->transport);
+    }
+
+    public function consumerGroups(): ConsumerGroups
+    {
+        return new ConsumerGroups($this->transport);
+    }
+
+    public function pluginConfigs(): PluginConfigs
+    {
+        return new PluginConfigs($this->transport);
+    }
+
+    public function globalRules(): GlobalRules
+    {
+        return new GlobalRules($this->transport);
     }
 
     /**
