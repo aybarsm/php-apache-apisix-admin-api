@@ -1,5 +1,5 @@
 {
-    "name": "aybarsm/podman-api",
+    "name": "aybarsm/apache-apisix-admin-api",
     "description": "Framework-agnostic, typed, resource-oriented PHP client for the Apache APISIX Admin REST API.",
     "type": "library",
     "license": "MIT",
