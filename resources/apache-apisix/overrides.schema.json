@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aybarsm/php-apache-apisix-admin-api/resources/apache-apisix/overrides.schema.json",
+  "title": "APISIX Admin API spec overrides",
+  "description": "Corrections layered over a pristine resources/apache-apisix/v{version}.json. Every operation entry must explain the issue, the actual behaviour and the evidence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["spec", "operations", "exclude", "notes"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "spec": { "type": "string", "pattern": "^v\\d+\\.\\d+\\.\\d+\\.json$" },
+    "operations": {
+      "type": "object",
+      "description": "Keyed by the spec's original operationId.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["issue", "actual", "evidence"],
+        "properties": {
+          "rename": { "type": "string", "pattern": "^[a-z][A-Za-z0-9]*$" },
+          "responses": {
+            "type": "object",
+            "description": "Status code => replacement JSON schema (may be a $ref into the spec).",
+            "propertyNames": { "pattern": "^[1-5][0-9]{2}$" },
+            "additionalProperties": { "type": "object" }
+          },
+          "issue": { "type": "string", "minLength": 1 },
+          "actual": { "type": "string", "minLength": 1 },
+          "evidence": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "exclude": {
+      "type": "object",
+      "description": "Original operationId => reason it is intentionally not implemented.",
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["topic", "detail"],
+        "properties": {
+          "topic": { "type": "string", "minLength": 1 },
+          "detail": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

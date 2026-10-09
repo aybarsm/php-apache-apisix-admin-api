@@ -1,0 +1,10 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Application;
+
+require dirname(__DIR__).'/vendor/autoload.php';
+
+exit((new Application(dirname(__DIR__)))->run(array_values(array_slice($argv, 1))));

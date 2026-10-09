@@ -1,0 +1,7 @@
+parameters:
+    level: max
+    phpVersion: 80300
+    tmpDir: build/phpstan
+    paths:
+        - src
+        - dev-tools/src

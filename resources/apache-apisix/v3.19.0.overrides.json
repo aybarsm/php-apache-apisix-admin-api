@@ -1,0 +1,54 @@
+{
+  "$schema": "./overrides.schema.json",
+  "spec": "v3.19.0.json",
+  "operations": {
+    "getId]": {
+      "rename": "getStreamRoute",
+      "issue": "Malformed operationId on GET /apisix/admin/stream_routes/{id}.",
+      "actual": "Single stream route lookup; canonical id getStreamRoute.",
+      "evidence": "Spec v3.19.0 paths./apisix/admin/stream_routes/{id}.get.operationId == \"getId]\"."
+    },
+    "putId]": {
+      "rename": "putStreamRoute",
+      "issue": "Malformed operationId on PUT /apisix/admin/stream_routes/{id}.",
+      "actual": "Create-or-replace stream route by id; canonical id putStreamRoute.",
+      "evidence": "Spec v3.19.0 paths./apisix/admin/stream_routes/{id}.put.operationId == \"putId]\"."
+    },
+    "deleteId]": {
+      "rename": "deleteStreamRoute",
+      "issue": "Malformed operationId on DELETE /apisix/admin/stream_routes/{id}.",
+      "actual": "Delete stream route by id; canonical id deleteStreamRoute.",
+      "evidence": "Spec v3.19.0 paths./apisix/admin/stream_routes/{id}.delete.operationId == \"deleteId]\"."
+    }
+  },
+  "exclude": {
+    "listGraphQLCostDecorations": "GraphQL cost decorations are API7-specific; out of scope for the open-source APISIX client.",
+    "createGraphQLCostDecoration": "GraphQL cost decorations are API7-specific; out of scope for the open-source APISIX client.",
+    "getGraphQLCostDecoration": "GraphQL cost decorations are API7-specific; out of scope for the open-source APISIX client.",
+    "replaceGraphQLCostDecoration": "GraphQL cost decorations are API7-specific; out of scope for the open-source APISIX client.",
+    "updateGraphQLCostDecoration": "GraphQL cost decorations are API7-specific; out of scope for the open-source APISIX client.",
+    "deleteGraphQLCostDecoration": "GraphQL cost decorations are API7-specific; out of scope for the open-source APISIX client."
+  },
+  "notes": [
+    {
+      "topic": "PUT /apisix/admin/consumers",
+      "detail": "Consumers are created/replaced with PUT on the collection; the identity is the `username` property in the body, not a path segment."
+    },
+    {
+      "topic": "PATCH .../{id}/{sub_path}",
+      "detail": "The request body is any JSON value (scalar, array or object) that replaces the value at the slash-separated sub_path."
+    },
+    {
+      "topic": "PUT /apisix/admin/plugins/reload",
+      "detail": "Responds with a plain string body rather than a JSON object."
+    },
+    {
+      "topic": "Untyped responses",
+      "detail": "Secrets and plugin_metadata endpoints declare 200 responses as untyped objects (or inline schemas); DTOs for them are derived from the request schemas and examples."
+    },
+    {
+      "topic": "Health tag",
+      "detail": "HEAD /apisix/admin (operationId ping) is unauthenticated and returns 200 with no body."
+    }
+  ]
+}
