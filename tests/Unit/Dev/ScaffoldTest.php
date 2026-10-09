@@ -13,8 +13,15 @@ use Aybarsm\Apache\Apisix\AdminApi\Tests\Support\SpecExamples;
  */
 const UNEDITED_DTOS = [
     'Timeout', 'KeepalivePool', 'UpstreamTLS', 'UpstreamWarmUp', 'UpstreamNodeItem', 'HealthCheck',
-    'HealthCheckActiveHealthy', 'HealthCheckActiveUnhealthy', 'HealthCheckPassiveHealthy', 'HealthCheckPassiveUnhealthy',
+    'HealthCheckActive', 'HealthCheckActiveHealthy', 'HealthCheckActiveUnhealthy',
+    'HealthCheckPassive', 'HealthCheckPassiveHealthy', 'HealthCheckPassiveUnhealthy',
+    'Route', 'Service', 'StreamRoute', 'Proto',
 ];
+
+function dtoGenerator(): DtoGenerator
+{
+    return new DtoGenerator(SpecExamples::spec(), DtoGenerator::discoverEnums(projectRoot('src/Enums')));
+}
 
 const UNEDITED_RESOURCES = [
     'Upstreams' => 'Upstreams',
@@ -29,13 +36,15 @@ it('names things consistently', function (): void {
         ->and(Naming::property('create_time'))->toBe('createTime')
         ->and(Naming::enumCase('least_conn'))->toBe('LeastConn')
         ->and(Naming::enumCase(1))->toBe('Value1')
-        ->and(Naming::enumCase('TLSv1.2'))->toBe('Tlsv12');
+        ->and(Naming::enumCase('TLSv1.2'))->toBe('Tlsv12')
+        ->and(Naming::enumCase(0, 'Disabled.'))->toBe('Disabled')
+        ->and(Naming::enumCase(1, 'Enabled (default).'))->toBe('Enabled');
 });
 
 it('reproduces unedited DTOs', function (string $schema): void {
     $path = projectRoot('src/Dto/'.Naming::className($schema).'.php');
 
-    expect((new DtoGenerator(SpecExamples::spec()))->dtoSource($schema))->toBe(file_get_contents($path));
+    expect(dtoGenerator()->dtoSource($schema))->toBe(file_get_contents($path));
 })->with(UNEDITED_DTOS);
 
 it('reproduces unedited resources', function (string $tag, string $class): void {
@@ -43,6 +52,15 @@ it('reproduces unedited resources', function (string $tag, string $class): void 
 
     expect(array_values($files)[0])->toBe(file_get_contents(projectRoot(array_key_first($files))));
 })->with(fn (): array => array_map(null, array_keys(UNEDITED_RESOURCES), array_values(UNEDITED_RESOURCES)));
+
+it('reuses existing enums by name or identical values', function (): void {
+    $generator = dtoGenerator();
+
+    expect($generator->dtoSource('HealthCheckPassive'))->toContain('?HealthCheckType $type')
+        ->and($generator->dtoSource('Route'))->toContain('?Status $status')
+        ->and($generator->enumSources('Route'))->toBe([])
+        ->and((new DtoGenerator(SpecExamples::spec()))->enumSources('Route'))->toHaveKey('RouteStatus');
+});
 
 it('computes the nested schema closure', function (): void {
     expect((new DtoGenerator(SpecExamples::spec()))->closure('HealthCheck'))

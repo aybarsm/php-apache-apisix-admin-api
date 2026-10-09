@@ -46,7 +46,7 @@ final readonly class ScaffoldCommand implements Command
         $subject = $args->argument(1) ?? throw new SpecException('Missing <Schema> or <Tag> argument.');
 
         $files = match ($kind) {
-            'dto' => $this->dtoFiles(new DtoGenerator($spec), $subject, $args->flag('deep')),
+            'dto' => $this->dtoFiles(new DtoGenerator($spec, DtoGenerator::discoverEnums($this->root.'/src/Enums')), $subject, $args->flag('deep')),
             'resource' => (new ResourceGenerator($spec))->files($subject, $args->option('class')),
             default => throw new SpecException('Usage: '.$this->usage()),
         };

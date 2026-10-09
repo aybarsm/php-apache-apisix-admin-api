@@ -131,3 +131,16 @@ function dtoClasses(): array
 
     return $out;
 }
+
+/**
+ * Runs `bin/spec` in-process.
+ *
+ * @return array{0: int, 1: string} exit code and output
+ */
+function runSpec(string ...$argv): array
+{
+    $output = Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Output::buffered();
+    $code = (new Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Application(projectRoot()))->run(array_values($argv), $output);
+
+    return [$code, $output->contents()];
+}

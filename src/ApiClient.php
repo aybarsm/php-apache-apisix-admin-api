@@ -8,6 +8,10 @@ use Aybarsm\Apache\Apisix\AdminApi\Attributes\SpecOperation;
 use Aybarsm\Apache\Apisix\AdminApi\Enums\HttpMethod;
 use Aybarsm\Apache\Apisix\AdminApi\Exceptions\ApacheApisixApiException;
 use Aybarsm\Apache\Apisix\AdminApi\Internal\Transport;
+use Aybarsm\Apache\Apisix\AdminApi\Resources\Protos;
+use Aybarsm\Apache\Apisix\AdminApi\Resources\Routes;
+use Aybarsm\Apache\Apisix\AdminApi\Resources\Services;
+use Aybarsm\Apache\Apisix\AdminApi\Resources\StreamRoutes;
 use Aybarsm\Apache\Apisix\AdminApi\Resources\Upstreams;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Psr7\HttpFactory;
@@ -55,9 +59,29 @@ final readonly class ApiClient
         return new self(new ClientConfig($baseUri, $apiKey), $http, $requestFactory, $streamFactory);
     }
 
+    public function routes(): Routes
+    {
+        return new Routes($this->transport);
+    }
+
+    public function services(): Services
+    {
+        return new Services($this->transport);
+    }
+
     public function upstreams(): Upstreams
     {
         return new Upstreams($this->transport);
+    }
+
+    public function streamRoutes(): StreamRoutes
+    {
+        return new StreamRoutes($this->transport);
+    }
+
+    public function protos(): Protos
+    {
+        return new Protos($this->transport);
     }
 
     /**

@@ -2,16 +2,6 @@
 
 declare(strict_types=1);
 
-use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Application;
-use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Output;
-
-function runSpec(string ...$argv): array
-{
-    $output = Output::buffered();
-    $code = (new Application(projectRoot()))->run(array_values($argv), $output);
-
-    return [$code, $output->contents()];
-}
 
 it('prints help', function (): void {
     [$code, $out] = runSpec('help');

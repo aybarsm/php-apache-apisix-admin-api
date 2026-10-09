@@ -34,12 +34,18 @@ final class Naming
     }
 
     /**
-     * Enum case name for a backed value: `least_conn` => `LeastConn`, `1` => `Value1`.
+     * Enum case name for a backed value: `least_conn` => `LeastConn`.
+     *
+     * Integer values use the spec's `x-enumDescriptions` (`"Enabled (default)."` => `Enabled`)
+     * when given, `Value1` otherwise.
      */
-    public static function enumCase(string|int $value): string
+    public static function enumCase(string|int $value, ?string $description = null): string
     {
         if (is_int($value) || ctype_digit($value)) {
-            return 'Value'.$value;
+            $label = $description === null ? '' : trim((string) preg_replace('/[(.,:;].*$/s', '', $description));
+            $label = (string) preg_replace('/[^A-Za-z0-9]+/', '_', $label);
+
+            return $label === '' || $label === '_' ? 'Value'.$value : self::className(trim($label, '_'));
         }
 
         $case = self::className((string) preg_replace('/[^A-Za-z0-9]+/', '_', $value));

@@ -14,7 +14,7 @@ final readonly class Property
      * @param string|null $docType    PHPDoc type when more precise than the native type
      * @param string      $accessor   `Data` call template, `%s` is the JSON key
      * @param string|null $dependency schema name of a nested DTO
-     * @param array{name: string, backing: string, values: list<string|int>}|null $enum
+     * @param array{name: string, backing: string, values: list<string|int>, labels: array<string, string>}|null $enum
      */
     public function __construct(
         public string $key,

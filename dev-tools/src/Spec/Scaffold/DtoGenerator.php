@@ -25,9 +25,31 @@ final readonly class DtoGenerator
     /** Schemas that map onto built-in PHP shapes instead of DTOs. */
     private const array SPECIAL = ['ResourceId', 'Labels', 'Plugins'];
 
+    /**
+     * @param array<string, list<string|int>> $existingEnums enum short name => backed values, reused instead of regenerated
+     */
     public function __construct(
         private Spec $spec,
+        private array $existingEnums = [],
     ) {}
+
+    /**
+     * Backed enums currently declared in src/Enums.
+     *
+     * @return array<string, list<string|int>>
+     */
+    public static function discoverEnums(string $enumDir): array
+    {
+        $out = [];
+        foreach (glob(rtrim($enumDir, '/').'/*.php') ?: [] as $file) {
+            $class = self::ENUM_NAMESPACE.'\\'.basename($file, '.php');
+            if (enum_exists($class) && is_subclass_of($class, \BackedEnum::class)) {
+                $out[basename($file, '.php')] = array_map(static fn (\BackedEnum $c): string|int => $c->value, $class::cases());
+            }
+        }
+
+        return $out;
+    }
 
     /**
      * @return list<Property>
@@ -175,11 +197,12 @@ final readonly class DtoGenerator
     {
         $out = [];
         foreach ($this->properties($schemaName) as $p) {
-            if ($p->enum === null) {
+            if ($p->enum === null || isset($this->existingEnums[$p->enum['name']])) {
                 continue;
             }
+            $labels = $p->enum['labels'];
             $cases = array_map(
-                static fn (string|int $v): string => sprintf('    case %s = %s;', Naming::enumCase($v), var_export($v, true)),
+                static fn (string|int $v): string => sprintf('    case %s = %s;', Naming::enumCase($v, $labels[(string) $v] ?? null), var_export($v, true)),
                 $p->enum['values'],
             );
             $out[$p->enum['name']] = implode("\n", [
@@ -255,12 +278,19 @@ final readonly class DtoGenerator
 
         if (isset($schema['enum']) && is_array($schema['enum']) && in_array($type, ['string', 'integer'], true)) {
             $values = array_values(array_filter($schema['enum'], static fn (mixed $v): bool => is_string($v) || is_int($v)));
-            $enum = Naming::className($owner).Naming::className($key);
+            $labels = [];
+            foreach (is_array($schema['x-enumDescriptions'] ?? null) ? $schema['x-enumDescriptions'] : [] as $value => $label) {
+                if (is_string($label)) {
+                    $labels[(string) $value] = $label;
+                }
+            }
+            $enum = $this->enumName(Naming::className($owner).Naming::className($key), $values);
 
             return new Property($key, $name, $enum, null, '$data->enum(%s, '.$enum.'::class)', $required, $readOnly, enum: [
                 'name' => $enum,
                 'backing' => $type === 'integer' ? 'int' : 'string',
                 'values' => $values,
+                'labels' => $labels,
             ]);
         }
 
@@ -273,6 +303,29 @@ final readonly class DtoGenerator
             'object' => new Property($key, $name, 'array', 'array<string, mixed>', '$data->map(%s)', $required, $readOnly, 1),
             default => new Property($key, $name, 'mixed', null, '$data->mixed(%s)', false, $readOnly, todo: 'untyped in spec'),
         };
+    }
+
+    /**
+     * Reuses an existing enum with the same name, or failing that the same set of values.
+     *
+     * @param list<string|int> $values
+     */
+    private function enumName(string $candidate, array $values): string
+    {
+        if (isset($this->existingEnums[$candidate])) {
+            return $candidate;
+        }
+
+        $sorted = $values;
+        sort($sorted);
+        foreach ($this->existingEnums as $name => $existing) {
+            sort($existing);
+            if ($existing === $sorted) {
+                return $name;
+            }
+        }
+
+        return $candidate;
     }
 
     /**
