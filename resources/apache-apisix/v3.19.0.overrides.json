@@ -4,9 +4,17 @@
   "operations": {
     "getId]": {
       "rename": "getStreamRoute",
-      "issue": "Malformed operationId on GET /apisix/admin/stream_routes/{id}.",
-      "actual": "Single stream route lookup; canonical id getStreamRoute.",
-      "evidence": "Spec v3.19.0 paths./apisix/admin/stream_routes/{id}.get.operationId == \"getId]\"."
+      "issue": "Malformed operationId on GET /apisix/admin/stream_routes/{id}; 200 response is an untyped object and 404 is undocumented.",
+      "actual": "Single stream route lookup returning StreamRouteEnvelope (404 when missing); canonical id getStreamRoute.",
+      "evidence": "Spec v3.19.0 operationId == \"getId]\". Verified against the APISIX 3.19.0 source shipped in the apache/apisix image (apisix/admin/resource.lua): _M:get returns the single etcd node envelope, and the 404 status of a missing key.",
+      "responses": {
+        "200": {
+          "$ref": "#/components/schemas/StreamRouteEnvelope"
+        },
+        "404": {
+          "$ref": "#/components/schemas/NotFoundResponse"
+        }
+      }
     },
     "putId]": {
       "rename": "putStreamRoute",
@@ -19,6 +27,86 @@
       "issue": "Malformed operationId on DELETE /apisix/admin/stream_routes/{id}.",
       "actual": "Delete stream route by id; canonical id deleteStreamRoute.",
       "evidence": "Spec v3.19.0 paths./apisix/admin/stream_routes/{id}.delete.operationId == \"deleteId]\"."
+    },
+    "patchRoutesSubPath": {
+      "responses": {
+        "200": {
+          "$ref": "#/components/schemas/RouteEnvelope"
+        }
+      },
+      "issue": "200 response declares no body.",
+      "actual": "Returns the updated resource in the etcd envelope, same as the full PATCH.",
+      "evidence": "Verified against the APISIX 3.19.0 source shipped in the apache/apisix image (apisix/admin/resource.lua): _M:patch handles sub_path and returns `res.status, res.body` from core.etcd.atomic_set."
+    },
+    "patchServicesSubPath": {
+      "responses": {
+        "200": {
+          "$ref": "#/components/schemas/ServiceEnvelope"
+        }
+      },
+      "issue": "200 response declares no body.",
+      "actual": "Returns the updated resource in the etcd envelope, same as the full PATCH.",
+      "evidence": "Verified against the APISIX 3.19.0 source shipped in the apache/apisix image (apisix/admin/resource.lua): _M:patch handles sub_path and returns `res.status, res.body` from core.etcd.atomic_set."
+    },
+    "patchUpstreamsSubPath": {
+      "responses": {
+        "200": {
+          "$ref": "#/components/schemas/UpstreamEnvelope"
+        }
+      },
+      "issue": "200 response declares no body.",
+      "actual": "Returns the updated resource in the etcd envelope, same as the full PATCH.",
+      "evidence": "Verified against the APISIX 3.19.0 source shipped in the apache/apisix image (apisix/admin/resource.lua): _M:patch handles sub_path and returns `res.status, res.body` from core.etcd.atomic_set."
+    },
+    "patchSSLCertificatesSubPath": {
+      "responses": {
+        "200": {
+          "$ref": "#/components/schemas/SSLEnvelope"
+        }
+      },
+      "issue": "200 response declares no body.",
+      "actual": "Returns the updated resource in the etcd envelope, same as the full PATCH.",
+      "evidence": "Verified against the APISIX 3.19.0 source shipped in the apache/apisix image (apisix/admin/resource.lua): _M:patch handles sub_path and returns `res.status, res.body` from core.etcd.atomic_set."
+    },
+    "patchConsumerGroupsSubPath": {
+      "responses": {
+        "200": {
+          "$ref": "#/components/schemas/ConsumerGroupEnvelope"
+        }
+      },
+      "issue": "200 response declares no body.",
+      "actual": "Returns the updated resource in the etcd envelope, same as the full PATCH.",
+      "evidence": "Verified against the APISIX 3.19.0 source shipped in the apache/apisix image (apisix/admin/resource.lua): _M:patch handles sub_path and returns `res.status, res.body` from core.etcd.atomic_set."
+    },
+    "patchGlobalRulesSubPath": {
+      "responses": {
+        "200": {
+          "$ref": "#/components/schemas/GlobalRuleEnvelope"
+        }
+      },
+      "issue": "200 response declares no body.",
+      "actual": "Returns the updated resource in the etcd envelope, same as the full PATCH.",
+      "evidence": "Verified against the APISIX 3.19.0 source shipped in the apache/apisix image (apisix/admin/resource.lua): _M:patch handles sub_path and returns `res.status, res.body` from core.etcd.atomic_set."
+    },
+    "patchPluginConfigsSubPath": {
+      "responses": {
+        "200": {
+          "$ref": "#/components/schemas/PluginConfigEnvelope"
+        }
+      },
+      "issue": "200 response declares no body.",
+      "actual": "Returns the updated resource in the etcd envelope, same as the full PATCH.",
+      "evidence": "Verified against the APISIX 3.19.0 source shipped in the apache/apisix image (apisix/admin/resource.lua): _M:patch handles sub_path and returns `res.status, res.body` from core.etcd.atomic_set."
+    },
+    "getCredential": {
+      "responses": {
+        "200": {
+          "$ref": "#/components/schemas/CredentialEnvelope"
+        }
+      },
+      "issue": "200 response declares CredentialListEnvelope for a single-credential lookup.",
+      "actual": "Returns a single CredentialEnvelope.",
+      "evidence": "Verified against the APISIX 3.19.0 source shipped in the apache/apisix image (apisix/admin/resource.lua): _M:get with an id calls core.etcd.get(key, false) on /consumers/{username}/credentials/{id} (single key, no range)."
     }
   },
   "exclude": {

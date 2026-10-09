@@ -122,6 +122,9 @@ it('never exposes PSR-7 messages or internal transport types through the public 
             continue;
         }
         foreach ($class->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            if (str_contains((string) $method->getDocComment(), '@internal')) {
+                continue; // wiring used by ApiClient, not public API
+            }
             $types = $typeNames($method->getReturnType());
             foreach ($method->getParameters() as $parameter) {
                 array_push($types, ...$typeNames($parameter->getType()));

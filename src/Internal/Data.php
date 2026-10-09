@@ -50,6 +50,41 @@ final readonly class Data
         return $out;
     }
 
+    /**
+     * Asserts that an optional accessor produced a value.
+     *
+     * @template T
+     *
+     * @param T|null $value
+     *
+     * @return T
+     */
+    public function required(mixed $value, string $key): mixed
+    {
+        return $value ?? throw $this->missing($key);
+    }
+
+    /**
+     * @return array<string, int>|null
+     */
+    public function intMap(string $key): ?array
+    {
+        $map = $this->map($key);
+        if ($map === null) {
+            return null;
+        }
+
+        $out = [];
+        foreach ($map as $name => $item) {
+            if (! is_int($item)) {
+                throw new HydrationException($this->path($key).'.'.$name, sprintf('expected integer, got %s', get_debug_type($item)));
+            }
+            $out[$name] = $item;
+        }
+
+        return $out;
+    }
+
     public function has(string $key): bool
     {
         return array_key_exists($key, $this->data);

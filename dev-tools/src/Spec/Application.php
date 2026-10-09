@@ -7,6 +7,7 @@ namespace Aybarsm\Apache\Apisix\AdminApi\Dev\Spec;
 use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Commands\Command;
 use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Commands\CoverageCommand;
 use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Commands\OpsCommand;
+use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Commands\ScaffoldCommand;
 use Throwable;
 
 /**
@@ -25,6 +26,7 @@ final class Application
         foreach ([
             new OpsCommand($loader, $scanner),
             new CoverageCommand($loader, $scanner),
+            new ScaffoldCommand($loader, rtrim($root, '/')),
         ] as $command) {
             $this->commands[$command->name()] = $command;
         }

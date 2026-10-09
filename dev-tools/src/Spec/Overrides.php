@@ -111,6 +111,7 @@ final readonly class Overrides
 
         $responses = [];
         foreach (Json::optionalMap($entry['responses'] ?? null, $ctx.'.responses') as $status => $schema) {
+            $status = (string) $status; // numeric JSON keys become ints in PHP arrays
             if (preg_match('/^[1-5]\d{2}$/', $status) !== 1) {
                 throw new SpecException(sprintf('%s.responses: invalid status "%s"', $ctx, $status));
             }

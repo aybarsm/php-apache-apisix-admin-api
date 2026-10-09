@@ -8,6 +8,7 @@ use Aybarsm\Apache\Apisix\AdminApi\Attributes\SpecOperation;
 use Aybarsm\Apache\Apisix\AdminApi\Enums\HttpMethod;
 use Aybarsm\Apache\Apisix\AdminApi\Exceptions\ApacheApisixApiException;
 use Aybarsm\Apache\Apisix\AdminApi\Internal\Transport;
+use Aybarsm\Apache\Apisix\AdminApi\Resources\Upstreams;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Psr7\HttpFactory;
 use Psr\Http\Client\ClientInterface;
@@ -52,6 +53,11 @@ final readonly class ApiClient
         ?StreamFactoryInterface $streamFactory = null,
     ): self {
         return new self(new ClientConfig($baseUri, $apiKey), $http, $requestFactory, $streamFactory);
+    }
+
+    public function upstreams(): Upstreams
+    {
+        return new Upstreams($this->transport);
     }
 
     /**

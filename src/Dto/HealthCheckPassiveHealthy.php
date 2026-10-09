@@ -10,23 +10,23 @@ use Aybarsm\Apache\Apisix\AdminApi\Internal\Data;
 use Override;
 
 /**
- * Spec schema `Timeout`: Timeout settings in seconds for connecting to, sending data to, and reading data from the upstream.
+ * Spec schema `HealthCheckPassiveHealthy`: Thresholds for considering a target healthy based on real traffic responses.
  */
-final readonly class Timeout implements Dto
+final readonly class HealthCheckPassiveHealthy implements Dto
 {
     use DtoBehaviour;
 
-    public const string SCHEMA = 'Timeout';
+    public const string SCHEMA = 'HealthCheckPassiveHealthy';
 
-    public const array KEYS = ['connect', 'send', 'read'];
+    public const array KEYS = ['http_statuses', 'successes'];
 
     /**
+     * @param list<int>|null $httpStatuses
      * @param array<string, mixed> $extra
      */
     public function __construct(
-        public int|float $connect,
-        public int|float $send,
-        public int|float $read,
+        public ?array $httpStatuses = null,
+        public ?int $successes = null,
         public array $extra = [],
     ) {}
 
@@ -34,9 +34,8 @@ final readonly class Timeout implements Dto
     public static function fromData(Data $data): static
     {
         return new self(
-            connect: $data->required($data->number('connect'), 'connect'),
-            send: $data->required($data->number('send'), 'send'),
-            read: $data->required($data->number('read'), 'read'),
+            httpStatuses: $data->intList('http_statuses'),
+            successes: $data->int('successes'),
             extra: $data->extra(self::KEYS),
         );
     }
@@ -45,9 +44,8 @@ final readonly class Timeout implements Dto
     protected function payload(): array
     {
         return [
-            'connect' => $this->connect,
-            'send' => $this->send,
-            'read' => $this->read,
+            'http_statuses' => $this->httpStatuses,
+            'successes' => $this->successes,
         ];
     }
 }

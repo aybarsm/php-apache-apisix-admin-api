@@ -10,23 +10,22 @@ use Aybarsm\Apache\Apisix\AdminApi\Internal\Data;
 use Override;
 
 /**
- * Spec schema `Timeout`: Timeout settings in seconds for connecting to, sending data to, and reading data from the upstream.
+ * Spec schema `HealthCheck`: Health check configuration for monitoring upstream node availability. Active checks require at least the `active` field.
  */
-final readonly class Timeout implements Dto
+final readonly class HealthCheck implements Dto
 {
     use DtoBehaviour;
 
-    public const string SCHEMA = 'Timeout';
+    public const string SCHEMA = 'HealthCheck';
 
-    public const array KEYS = ['connect', 'send', 'read'];
+    public const array KEYS = ['active', 'passive'];
 
     /**
      * @param array<string, mixed> $extra
      */
     public function __construct(
-        public int|float $connect,
-        public int|float $send,
-        public int|float $read,
+        public ?HealthCheckActive $active = null,
+        public ?HealthCheckPassive $passive = null,
         public array $extra = [],
     ) {}
 
@@ -34,9 +33,8 @@ final readonly class Timeout implements Dto
     public static function fromData(Data $data): static
     {
         return new self(
-            connect: $data->required($data->number('connect'), 'connect'),
-            send: $data->required($data->number('send'), 'send'),
-            read: $data->required($data->number('read'), 'read'),
+            active: $data->dto('active', HealthCheckActive::class),
+            passive: $data->dto('passive', HealthCheckPassive::class),
             extra: $data->extra(self::KEYS),
         );
     }
@@ -45,9 +43,8 @@ final readonly class Timeout implements Dto
     protected function payload(): array
     {
         return [
-            'connect' => $this->connect,
-            'send' => $this->send,
-            'read' => $this->read,
+            'active' => $this->active,
+            'passive' => $this->passive,
         ];
     }
 }

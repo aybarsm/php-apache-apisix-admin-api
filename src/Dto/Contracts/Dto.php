@@ -17,6 +17,11 @@ use JsonSerializable;
 interface Dto extends JsonSerializable
 {
     /**
+     * Name of the spec schema (`#/components/schemas/<SCHEMA>`) this DTO mirrors.
+     */
+    public const string SCHEMA = '';
+
+    /**
      * JSON keys described by the schema, in spec order.
      *
      * @var list<string>

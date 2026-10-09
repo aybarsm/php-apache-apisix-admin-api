@@ -84,3 +84,50 @@ function liveId(string $prefix = 'it'): string
 {
     return $prefix.'-'.bin2hex(random_bytes(4));
 }
+
+/**
+ * Recursively sorts associative arrays by key so strict comparisons ignore key order.
+ */
+function canonical(mixed $value): mixed
+{
+    if (! is_array($value)) {
+        return $value;
+    }
+    $value = array_map(canonical(...), $value);
+    if (! array_is_list($value)) {
+        ksort($value);
+    }
+
+    return $value;
+}
+
+/**
+ * Envelope list response with `$count` items out of `$total`.
+ */
+function listResponse(int $total, int $count, string $resource = 'upstreams'): array
+{
+    $list = [];
+    for ($i = 0; $i < $count; $i++) {
+        $id = 'id-'.bin2hex(random_bytes(3));
+        $list[] = ['key' => "/apisix/{$resource}/{$id}", 'value' => ['id' => $id, 'nodes' => ['127.0.0.1:80' => 1]], 'createdIndex' => 1, 'modifiedIndex' => 1];
+    }
+
+    return ['total' => $total, 'list' => $list];
+}
+
+/**
+ * Every concrete DTO class under src/Dto that mirrors a spec schema.
+ *
+ * @return list<class-string<Aybarsm\Apache\Apisix\AdminApi\Dto\Contracts\Dto>>
+ */
+function dtoClasses(): array
+{
+    $out = [];
+    foreach (Aybarsm\Apache\Apisix\AdminApi\Tests\Support\SourceClasses::inNamespace('Dto') as $class) {
+        if ($class->isInstantiable() && $class->implementsInterface(Aybarsm\Apache\Apisix\AdminApi\Dto\Contracts\Dto::class) && $class->getConstant('SCHEMA') !== '') {
+            $out[] = $class->getName();
+        }
+    }
+
+    return $out;
+}
