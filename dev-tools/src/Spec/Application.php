@@ -6,6 +6,7 @@ namespace Aybarsm\Apache\Apisix\AdminApi\Dev\Spec;
 
 use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Commands\Command;
 use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Commands\CoverageCommand;
+use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Commands\DiffCommand;
 use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Commands\OpsCommand;
 use Aybarsm\Apache\Apisix\AdminApi\Dev\Spec\Commands\ScaffoldCommand;
 use Throwable;
@@ -18,15 +19,17 @@ final class Application
     /** @var array<string, Command> */
     private array $commands = [];
 
-    public function __construct(string $root)
+    public function __construct(string $root, ?SpecLoader $loader = null)
     {
-        $loader = SpecLoader::forProject($root);
+        $root = rtrim($root, '/');
+        $loader ??= SpecLoader::forProject($root);
         $scanner = AttributeScanner::forProject($root);
 
         foreach ([
             new OpsCommand($loader, $scanner),
             new CoverageCommand($loader, $scanner),
-            new ScaffoldCommand($loader, rtrim($root, '/')),
+            new DiffCommand($loader, $scanner, $root.'/src/Dto'),
+            new ScaffoldCommand($loader, $root),
         ] as $command) {
             $this->commands[$command->name()] = $command;
         }

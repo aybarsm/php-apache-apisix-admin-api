@@ -3,7 +3,11 @@
     "description": "Framework-agnostic, typed, resource-oriented PHP client for the Apache APISIX Admin REST API.",
     "type": "library",
     "license": "MIT",
-    "keywords": ["apache", "apisix", "api-client"],
+    "keywords": [
+        "apache",
+        "apisix",
+        "api-client"
+    ],
     "homepage": "https://github.com/aybarsm/php-apache-apisix-admin-api",
     "authors": [
         {
@@ -42,6 +46,8 @@
         ],
         "test:unit": "pest --testsuite=unit,arch",
         "test:integration": "pest --testsuite=integration",
+        "test:integration:cleanup": "php scripts/cleanup-integration.php",
+        "test:matrix": "scripts/test-matrix.sh",
         "analyse": "phpstan analyse --memory-limit=1G",
         "spec": "php bin/spec"
     },
